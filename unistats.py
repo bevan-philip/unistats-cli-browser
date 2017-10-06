@@ -7,11 +7,6 @@ with open("apikey.json", "r") as apiKeyFile:
     APIKEY = json.load(apiKeyFile)[0]["unistats"]
 
 # Library functions
-def loadUniList(fileName):
-    # loads the list of universities
-    with open(fileName, "r") as USJsonFile:
-        return json.load(USJsonFile) 
-
 def universities(query):
     baseURL = "http://data.unistats.ac.uk/api/v4/KIS/Institutions.JSON?pageIndex={0}&pageSize=100"
     pgN = 0
