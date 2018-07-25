@@ -2,6 +2,8 @@
 
 A command-line based script to allow basic navigation of the United Kingdom's Unistats database, and return the percentageLike, percentageInEmployment, percentageProfessional, medSalary.
 
+## api version
+tested against unistat's v4 api version
 
 ## dependencies:
 
