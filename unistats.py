@@ -1,13 +1,14 @@
 # Unistats API Parser
 import requests
 import json
+import sys
 
 # opens the file containing the apikey. a default example is given.
 with open("apikey.json", "r") as apiKeyFile:
     APIKEY = json.load(apiKeyFile)[0]["unistats"]
 
-# Library functions
 def universities(query):
+    # searches the list of institutions provides by unistats to see if any of them match the query
     baseURL = "http://data.unistats.ac.uk/api/v4/KIS/Institutions.JSON?pageIndex={0}&pageSize=100"
     pgN = 0
     URL = baseURL.format(pgN)
@@ -25,7 +26,7 @@ def universities(query):
             for uni in USUniResult:
                 if query.lower() in uni["Name"].lower():
                     result.append( {"name": uni["Name"], "prn": uni["UKPRN"]} )
-        print(result)
+        debug_print(result)
         return result
 
 def search(query, uniList):
@@ -66,9 +67,17 @@ def courses(query, prn):
                     result.append({"title": course["Title"], "KisCourseId": course["KisCourseId"], "KisMode": course["KisMode"]})
         return result
 
+def debug_print(output):
+    if len(sys.argv) > 1 and sys.argv[1] == "-d":
+        print(output)
+        return True
+    else:
+        return False
+
 # returns the statistics of the course requested.
 def courseStatistics(prn, KisCourseId, KisMode):
     URL = "http://data.unistats.ac.uk/api/v4/KIS/Institution/{0}/Course/{1}/{2}/Statistics.JSON".format(prn, KisCourseId, KisMode)
+    debug_print(URL)
     return requests.get(URL, auth=(APIKEY, 'pass')).json()
 
 # Program function
@@ -127,8 +136,6 @@ def courseStatisticsParser(stats):
             result["medSalary"] = stat["Details"][4]["Value"]
     return result
 
-# loads the university and allows the user to search the unistats database.
-uniList = loadUniList("ukrlp.json")
 UKPRN = False
 while UKPRN == False:
     unichoice = input("Search University: ")
@@ -142,4 +149,5 @@ while courseinfo == False:
     courseinfo = courseParser(courses(coursechoice, UKPRN))    
     if courseinfo == False:
         print("No course found with that name.")
+
 coursestats = print(courseStatisticsParser(courseStatistics(UKPRN, courseinfo["KisCourseId"], courseinfo["KisMode"])))
